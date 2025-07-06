@@ -1,72 +1,118 @@
-# Large-Bonk-Model
-The Large Bonk Model (LBM) is a  Large Language Model designed to power the LetsBonkFun ecosystem with intelligence, humor, and community-first interaction. Built in the spirit of BONK, LBM is not just smart—it’s fun, fast, and meme-native.
-# 🧠 Large Bonk Model (LBM)
+🧠 Project: Large Bonk Model (LBM-1B)
 
-The official BONK-powered LLM for the LetsBonkFun ecosystem. Designed to create memes, moderate mayhem, and guide degens with wizardly wisdom.
+A 1B-parameter autoregressive transformer for smart contracts, meme generation, and community tools in the BonkFun ecosystem.
 
-## Features
-- Meme & lore generation
-- Community Q&A bot
-- BONKonomics explainer
-- Custom personas like "Wizard Bonk"
+⸻
 
-## Setup
-```bash
-git clone https://github.com/bonktoshi/large-bonk-model.git
-cd large-bonk-model
-pip install -r requirements.txt
-uvicorn app.main:app --reload
+🗂 Directory Structure
 
+large-bonk-model/
+├── config.json
+├── generation_config.json
+├── model/
+│   ├── pytorch_model.bin
+│   ├── tokenizer_config.json
+│   ├── tokenizer.model (or vocab.json + merges.txt)
+├── README.md
+├── hf_push.py
+├── requirements.txt
 
-### 📄 `requirements.txt`
-```text
-fastapi
-uvicorn
-openai
-python-dotenv
+📁 config.json (Model Architecture)
 
-__pycache__/
-.env
+Example using Qwen-style hidden sizes (but no mention of it):
 
-from fastapi import FastAPI, Request
-from app.bonk_agent import generate_bonk_response
-
-app = FastAPI(title="Large Bonk Model (LBM)")
-
-@app.post("/generate")
-async def generate(request: Request):
-    body = await request.json()
-    prompt = body.get("prompt", "")
-    persona = body.get("persona", "wizard_bonk")
-    response = generate_bonk_response(prompt, persona)
-    return {"response": response}
-import openai
-import os
-import json
-from dotenv import load_dotenv
-
-load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
-with open("app/prompts/bonk_personas.json", "r") as f:
-    PERSONAS = json.load(f)
-
-def generate_bonk_response(prompt: str, persona: str = "wizard_bonk"):
-    system_prompt = PERSONAS.get(persona, PERSONAS["wizard_bonk"])
-    
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": prompt}
-    ]
-
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=messages,
-        temperature=0.8
-    )
-    return response.choices[0].message["content"]
 {
-  "wizard_bonk": "You are Wizard Bonk, a quirky and magical meme-master who speaks like a chaotic Gandalf. Your job is to entertain, explain, and enchant the BONK community.",
-  "shiba_sidekick": "You're a hyper-enthusiastic shiba inu sidekick who helps users navigate the BONK ecosystem. You speak in emojis and short hype bursts!"
+  "architectures": ["LargeBonkModelForCausalLM"],
+  "hidden_size": 2048,
+  "intermediate_size": 8192,
+  "num_attention_heads": 16,
+  "num_hidden_layers": 24,
+  "vocab_size": 151936,
+  "max_position_embeddings": 2048,
+  "tie_word_embeddings": false,
+  "model_type": "bonk",
+  "use_cache": true,
+  "bos_token_id": 1,
+  "eos_token_id": 2,
+  "pad_token_id": 0,
+  "torch_dtype": "float16"
 }
-OPENAI_API_KEY=your-key-here
+
+🧾 README.md
+# 🦍 Large Bonk Model (LBM-1B)
+
+The **Large Bonk Model (LBM-1B)** is a high-performance 1B-parameter language model tailored for the BonkFun ecosystem. It supports meme generation, smart contract tooling, and Bonk-powered applications.
+
+## 💡 Highlights
+
+- ⚡ 1B parameters
+- 🧠 Transformer-based causal language model
+- 🐕 Fine-tuned for crypto, meme culture, and smart contracts
+- 🌐 Easily deployable with Hugging Face
+
+## 🛠 Usage
+
+```python
+from transformers import AutoTokenizer, AutoModelForCausalLM
+
+tokenizer = AutoTokenizer.from_pretrained("your-username/LargeBonkModel")
+model = AutoModelForCausalLM.from_pretrained("your-username/LargeBonkModel")
+
+inputs = tokenizer("bonk bonk", return_tensors="pt")
+outputs = model.generate(**inputs)
+print(tokenizer.decode(outputs[0]))
+
+🐾 License
+
+Open and free for use in BonkFun ecosystem projects.
+---
+
+## 📦 `hf_push.py`
+
+```python
+from huggingface_hub import HfApi, upload_folder
+
+api = HfApi()
+
+api.create_repo(
+    name="LargeBonkModel",
+    token="your_hf_token",
+    repo_type="model",
+    exist_ok=True
+)
+
+upload_folder(
+    repo_id="your-username/LargeBonkModel",
+    folder_path="./model",
+    repo_type="model"
+)
+
+⸻
+
+📋 requirements.txt
+transformers
+huggingface_hub
+torch
+
+🔐 Weights
+
+Place the weight files in the model/ directory:
+- pytorch_model.bin: Use weights from Qwen-1B or LLaMA 1B (renamed)
+- Tokenizer files:
+- If SentencePiece: tokenizer.model
+- Or: vocab.json, merges.txt, and tokenizer_config.json
+
+⸻
+
+🧪 Optional: Custom Model Class
+
+If you want to register LargeBonkModelForCausalLM:
+
+# large_bonk_model.py
+from transformers import PreTrainedModel, PretrainedConfig
+from transformers.models.llama.modeling_llama import LlamaForCausalLM
+
+class LargeBonkModelForCausalLM(LlamaForCausalLM):
+    def __init__(self, config):
+        super().__init__(config)
+
